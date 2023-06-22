@@ -1,40 +1,28 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
+#include <iostream>
+#include <list>
 #include <string>
 #include <fstream>
 #include <random>
 #include <vector>
 #include <map>
 
-class Item {
-protected:
-    std::string itemName;
-    int itemDamage;
-    int itemQuantity;
-    static const std::vector<std::string> itemList;
-    std::vector<std::string> tempItemList;
-    const std::string itemListFile = "itemList.txt";
-//    static std::map<std::string, double> itemDropRates;
+//===============Item struct============//
 
-public:
-    Item();
-    Item(std::string itemName, int itemQuantity, int itemDamage);
-    virtual ~Item();
-
-    std::vector<Item> itemListCreate();
-    std::map<std::string, int> inventory;  // Map to store the items and their quantities
-//    static std::map<std::string, double> getItemDropRates();
-
-    void loadInventoryFromFile(const std::string& itemListFile);  // Load inventory from a file
-    void saveInventoryToFile(const std::string& itemListFile);  // Save inventory to a file
-
-    std::string get_itemName() const;
-    int get_itemQuantity();
-    int get_itemDamage() const;
+struct Item {
+    std::string name;
+    int attackBonus;
+    int defenseBonus;
+    int restoreHp;
+    int quantity;
+    Item(std::string n, int ab, int db, int rh, int q = 1) : name(n), attackBonus(ab), defenseBonus(db), restoreHp(rh), quantity(q) {}
 };
 
-class CharacterBase : public Item {
+//==================Character Base class==============//
+
+class CharacterBase {
 protected:
     std::string name;
     int strength, dexterity, endurance, intelligence, charisma;
@@ -43,7 +31,6 @@ protected:
 public:
     CharacterBase();
     CharacterBase(std::string name, int strength, int dexterity, int endurance, int intelligence, int charisma, int hp, int experience);
-    CharacterBase(std::string itemName, int itemQuantity, int itemDamage);
     virtual ~CharacterBase();
 
     std::string get_name();
@@ -55,18 +42,16 @@ public:
     int get_experience();
     int get_hp();
 
-    int getEquipmentDamage() const;
+
     int getDefense() const;
     void reduceHP(int damage);
     bool isDefeated() const;
-
-    void addItem(const Item& item, int quantity = 1);  // Add an item to the inventory
-    void removeItem(const Item& item, int quantity = 1);  // Remove an item from the inventory
-    void printInventory();  // Print the items in the inventory
-    bool equipItem(const Item& item);  // Equip an item from the inventory
 };
 
+//================= Character class =================//
+
 class Character : public CharacterBase {
+
 protected:
     int level;
     std::vector<std::string> fightHistory;
@@ -77,6 +62,9 @@ public:
     Character(std::string name, int strength, int dexterity, int endurance, int intelligence, int charisma, int hp, int experience);
     ~Character();
 
+
+
+    int getEquipmentDamage() const;
     int get_level();
     const std::vector<std::string>& getFightHistory() const;
     void addFightToHistory(const std::string& fightInfo);  // Add this line
@@ -89,6 +77,7 @@ public:
     friend class Thief;
 };
 
+//=============== Profession virtual class and its classes================//
 
 class Profession {
 public:

@@ -10,75 +10,12 @@
 #include "character.h"
 
 
-// ========== Item =============//
-
-
-Item::Item() = default;
-
-Item::Item(std::string itemName, int itemQuantity, int itemDamage) : itemName(itemName), itemQuantity(itemQuantity), itemDamage(itemDamage){
-    this->itemName = itemName;
-    this->itemQuantity = itemQuantity;
-    this->itemDamage = itemDamage;
-}
-
-std::string Item::get_itemName() const {
-    return itemName;
-}
-
-int Item::get_itemQuantity() {
-    return itemQuantity;
-}
-
-int Item::get_itemDamage() const {
-    return itemDamage;
-}
-
-std::vector<Item> Item::itemListCreate() {
-    std::vector<Item> itemList;
-    std::ifstream file(itemListFile);
-    if (file.is_open()) {
-        std::string itemName;
-        int itemQuantity;
-        int itemDamage;
-        while (file >> itemName >> itemQuantity >> itemDamage) {
-            itemList.emplace_back(itemName, itemQuantity, itemDamage);
-        }
-        file.close();
-    } else {
-        std::cerr << "Failed to open file for reading.\n";
-    }
-    return itemList;
-}
-
-void Item::saveInventoryToFile(const std::string& itemListFile) {
-    std::ofstream file(itemListFile);
-    if (file.is_open()) {
-        for (const auto& pair : inventory) {
-            file << pair.first << std::endl;
-            file << pair.second << std::endl;
-        }
-        file.close();
-    }
-}
-
-Item::~Item() = default;
-
-/*std::map<std::string, double> Item::getItemDropRates() {
-    return itemDropRates;
-}*/
-
 // =========== CharacterBase ==========//
 
 
 CharacterBase::CharacterBase() = default;
 
 CharacterBase::~CharacterBase() = default;
-
-CharacterBase::CharacterBase(std::string itemName, int itemQuantity, int itemDamage) : Item(itemName, itemQuantity, itemDamage) {
-    this->itemName = itemName;
-    this->itemQuantity = itemQuantity;
-    this->itemDamage = itemDamage;
-}
 
 CharacterBase::CharacterBase(std::string name, int strength, int dexterity, int endurance, int intelligence, int charisma, int hp, int experience)
         : name(name), strength(strength), dexterity(dexterity), endurance(endurance), intelligence(intelligence), charisma(charisma), hp(hp), experience(experience) {
@@ -90,48 +27,6 @@ CharacterBase::CharacterBase(std::string name, int strength, int dexterity, int 
     this->charisma = charisma;
     this->hp = hp;
     this->experience = experience;
-}
-
-void CharacterBase::addItem(const Item& item, int quantity) {
-    if (inventory.find(item.get_itemName()) != inventory.end()) {
-        // Item already exists in the inventory, increase the quantity
-        inventory[item.get_itemName()] += quantity;
-    } else {
-        // Item doesn't exist in the inventory, add it with the given quantity
-        inventory[item.get_itemName()] = quantity;
-    }
-}
-
-void CharacterBase::removeItem(const Item& item, int quantity) {
-    if (inventory.find(item.get_itemName()) != inventory.end()) {
-        // Item exists in the inventory
-        inventory[item.get_itemName()] -= quantity;
-        if (inventory[item.get_itemName()] <= 0) {
-            // If the quantity becomes zero or less, remove the item from the inventory
-            inventory.erase(item.get_itemName());
-        }
-    }
-}
-
-void CharacterBase::printInventory() {
-    std::cout << "Inventory:" << std::endl;
-    for (const auto& pair : inventory) {
-        std::cout << "Item: " << pair.first << ", Quantity: " << pair.second << std::endl;
-    }
-}
-
-bool CharacterBase::equipItem(const Item& item) {
-    if (inventory.find(item.get_itemName()) != inventory.end()) {
-        // Item exists in the inventory, equip it
-        // Add the logic for equipping the item based on your game mechanics
-        std::cout << "Equipping item: " << item.get_itemName() << std::endl;
-        return true;
-    }
-    return false;
-}
-
-int CharacterBase::getEquipmentDamage() const {
-    return (strength /*+ itemDamage*/);
 }
 
 int CharacterBase::getDefense() const {
@@ -183,6 +78,9 @@ void Character::addFightToHistory(const std::string& fightInfo) {
     }
 }
 
+int Character::getEquipmentDamage() const {
+    return (strength);
+}
 
 void Character::save_attributes() {
     level = 1;

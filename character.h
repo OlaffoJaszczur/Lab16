@@ -32,6 +32,7 @@ protected:
 public:
     CharacterBase();
     CharacterBase(std::string name, int strength, int dexterity, int endurance, int intelligence, int charisma, int hp, int experience);
+    CharacterBase(std::string name, std::string inventoryFile);
     virtual ~CharacterBase();
 
     std::string get_name();

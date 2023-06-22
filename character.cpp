@@ -7,6 +7,7 @@
 #include <cstdlib> // for rand() and srand()
 #include <ctime> // for time()
 #include <algorithm>
+#include <sstream>
 
 #include "character.h"
 
@@ -28,6 +29,11 @@ CharacterBase::CharacterBase(std::string name, int strength, int dexterity, int 
     this->charisma = charisma;
     this->hp = hp;
     this->experience = experience;
+}
+
+CharacterBase::CharacterBase(std::string name, std::string inventoryFile) : name(name), inventoryFile(inventoryFile) { //no work
+    this->name = name;
+    this->inventoryFile = (name + "_inventory.txt");
 }
 
 int CharacterBase::getDefense() const {
@@ -63,17 +69,18 @@ Character::Character(int level) : level(level) {
 Character::Character(std::string name, int strength, int dexterity, int endurance, int intelligence, int charisma, int hp, int experience) : CharacterBase(name, strength, dexterity, endurance, intelligence, charisma, hp, experience) {
     this->hp = hp;
     this->experience = experience;
+    inventoryFile = name + "_inventory.txt";
+    srand((unsigned)time(NULL));
+    loadInventory();
 
 }
 
-Character::Character(std::string name, std::string inventoryFile) : CharacterBase(name, inventoryFile) {
+Character::Character(std::string name, std::string inventoryFile) : CharacterBase(name, inventoryFile) { //no work
     srand((unsigned)time(NULL));
     loadInventory();
 }
 
-Character::~Character() {
-    saveInventory();
-}
+Character::~Character() {}
 
 Item Character::getPredefinedItem(const std::string& itemName) {
     // Define the predefined items
@@ -94,13 +101,14 @@ void Character::addItem(const std::string& itemName) {
     }
 }
 
-void Character::addItem(const Item& item) {   // Overloaded method
+void Character::addItem(const Item& item) {
     auto it = std::find_if(inventory.begin(), inventory.end(), [&](const Item& i){ return i.name == item.name; });
     if (it != inventory.end()) {
         it->quantity += item.quantity;
     } else {
         inventory.push_back(item);
     }
+    saveInventory();  // Save inventory to file after each addition.
 }
 
 void Character::removeItem(const std::string& itemName) {
@@ -114,10 +122,13 @@ void Character::removeItem(const std::string& itemName) {
 }
 
 void Character::displayInventory() {
+    if (inventory.empty()) {
+        std::cout << "Inventory is empty." << std::endl;
+        return;
+    }
+    std::cout << "Inventory:" << std::endl;
     for (const auto& item : inventory) {
-        std::cout << "Name: " << item.name << ", Attack Bonus: " << item.attackBonus
-                  << ", Defense Bonus: " << item.defenseBonus << ", Restore HP: " << item.restoreHp
-                  << ", Quantity: " << item.quantity << std::endl;
+        std::cout << "Name: " << item.name << ", Attack Bonus: " << item.attackBonus << ", Defense Bonus: " << item.defenseBonus << ", Restore HP: " << item.restoreHp << ", Quantity: " << item.quantity << std::endl;
     }
 }
 
@@ -131,18 +142,23 @@ void Character::saveInventory() {
 void Character::loadInventory() {
     std::ifstream file(inventoryFile);
     std::string line;
-    while (std::getline(file, line)) {
-        size_t pos1 = line.find(";");
-        size_t pos2 = line.find(";", pos1 + 1);
-        size_t pos3 = line.find(";", pos2 + 1);
-        size_t pos4 = line.find(";", pos3 + 1);
-        std::string name = line.substr(0, pos1);
-        int attackBonus = std::stoi(line.substr(pos1 + 1, pos2 - pos1 - 1));
-        int defenseBonus = std::stoi(line.substr(pos2 + 1, pos3 - pos2 - 1));
-        int restoreHp = std::stoi(line.substr(pos3 + 1, pos4 - pos3 - 1));
-        int quantity = std::stoi(line.substr(pos4 + 1));
-        addItem(Item(name, attackBonus, defenseBonus, restoreHp, quantity));
+    inventory.clear();  // clear existing inventory before loading
+    while (getline(file, line)) {
+        std::stringstream ss(line);
+        std::string name;
+        int attackBonus, defenseBonus, restoreHp, quantity;
+        getline(ss, name, ';');
+        ss >> attackBonus;
+        ss.ignore(); // ignore ';'
+        ss >> defenseBonus;
+        ss.ignore(); // ignore ';'
+        ss >> restoreHp;
+        ss.ignore(); // ignore ';'
+        ss >> quantity;
+        Item item(name, attackBonus, defenseBonus, restoreHp, quantity);
+        inventory.push_back(item);
     }
+    file.close();
 }
 
 void Character::equipItem(const std::string& itemName) {
@@ -174,7 +190,8 @@ void Character::slayMonster() {
     std::vector<std::string> items = {"Sword of Ice", "Armor of Spikes", "Potion of Health"};
     int index = rand() % items.size();
     if ((rand() / (double)RAND_MAX) <= dropRate(items[index])) {
-        addItem(items[index]);
+        addItem(getPredefinedItem(items[index]));
+        saveInventory();  // Save the current state of the inventory to the file
     }
 }
 

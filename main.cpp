@@ -93,7 +93,7 @@ void displayFightHistory(const Character& character) {
 int main() {
     int choice;
     int pool = 30;
-    std::string name, filename, mname;
+    std::string name, filename, inventoryFile;
     int strength, dexterity, endurance, intelligence, charisma, hp, experience, level;
 
     Character character(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
@@ -135,7 +135,7 @@ int main() {
             hp = 100;
             experience = 0;
 
-             Character character(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
+            Character character(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
 
             int profession_choice;
             std::cout << "Choose profession:\n1. Mage\n2. Warrior\n3. Berserker\n4. Thief" << std::endl;
@@ -168,6 +168,7 @@ int main() {
             }
 
             character.save_attributes();
+            character.saveInventory();
 
             std::cout << "Character saved to file." << std::endl;
         }
@@ -200,8 +201,9 @@ int main() {
                 std::cout << "Current HP: " << character.get_hp() << std::endl;
                 std::cout << "Current Experience: " << character.get_experience() << std::endl;
                 std::cout << "Level: " << level << std::endl;
-                std::cout << "\n here's one PoH on the house ;) " << std::endl;
+                std::cout << "Here's one PoH on the house ;) " << std::endl;
                 character.addItem("Potion of Health");
+                std::cout << endl;
             } else {
                 std::cout << "Error loading file." << std::endl;
             }
@@ -341,6 +343,9 @@ int main() {
             character.unequipItem(itemToBeUnequipedName);
         }
 
+        if(choice == 10){
+            character.saveInventory();
+        }
 
     } while (choice != 10);
 

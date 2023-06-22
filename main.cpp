@@ -6,6 +6,7 @@
 #include <limits>
 #include <sstream>
 #include <cstdio>
+#include <algorithm>
 
 #include "character.h"
 
@@ -52,6 +53,9 @@ void fight(CharacterType& character, MonsterType& monster) {
             cout << character.get_name() << " got:  " << monster.get_experience() << "  ex" << endl;
             fightResult = "Hero won the fight!";
             character.addFightToHistory(fightResult);
+            character.slayMonster();
+            std::cout << "\nInventory after slaying a monster: " << std::endl;
+            character.displayInventory();
             break;
         }
 
@@ -102,7 +106,8 @@ int main() {
     do {
         std::cout << "1. Create new character\n2. Load character\n3. Generate list of monsters\n"
                      "4. Clear monster list\n5. Simulate fight with 5 generated monsters\n6. Show list of last 10 fights"
-                     "\n7. Exit" << std::endl;
+                     "\n7. Show Inventory\n8. Equip an item\n9. Unequip an item"
+                     "\n10. Exit" << std::endl;
         std::cin >> choice;
 
         if (choice == 1) {
@@ -195,6 +200,8 @@ int main() {
                 std::cout << "Current HP: " << character.get_hp() << std::endl;
                 std::cout << "Current Experience: " << character.get_experience() << std::endl;
                 std::cout << "Level: " << level << std::endl;
+                std::cout << "\n here's one PoH on the house ;) " << std::endl;
+                character.addItem("Potion of Health");
             } else {
                 std::cout << "Error loading file." << std::endl;
             }
@@ -315,8 +322,27 @@ int main() {
             }
         }
 
+        if(choice == 7){
+            std::cout << "Inventory: " << std::endl;
+            character.displayInventory();
+        }
 
-    } while (choice != 7);
+        if(choice == 8){
+            string itemToBeEquipedName;
+            cout << "What item do you wanna equip" << endl;
+            cin >> itemToBeEquipedName;
+            character.equipItem(itemToBeEquipedName);
+        }
+
+        if(choice == 9){
+            string itemToBeUnequipedName;
+            cout << "What item do you wanna equip" << endl;
+            cin >> itemToBeUnequipedName;
+            character.unequipItem(itemToBeUnequipedName);
+        }
+
+
+    } while (choice != 10);
 
 
 

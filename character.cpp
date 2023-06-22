@@ -6,6 +6,7 @@
 #include <random>
 #include <cstdlib> // for rand() and srand()
 #include <ctime> // for time()
+#include <algorithm>
 
 #include "character.h"
 
@@ -65,7 +66,126 @@ Character::Character(std::string name, int strength, int dexterity, int enduranc
 
 }
 
-Character::~Character() = default;
+Character::Character(std::string name, std::string inventoryFile) : CharacterBase(name, inventoryFile) {
+    srand((unsigned)time(NULL));
+    loadInventory();
+}
+
+Character::~Character() {
+    saveInventory();
+}
+
+Item Character::getPredefinedItem(const std::string& itemName) {
+    // Define the predefined items
+    if (itemName == "Sword of Ice") return Item(itemName, 2, 0, 0);
+    if (itemName == "Armor of Spikes") return Item(itemName, 0, 5, 0);
+    if (itemName == "Potion of Health") return Item(itemName, 0, 0, 20);
+    // Default item
+    return Item(itemName, 0, 0, 0);
+}
+
+void Character::addItem(const std::string& itemName) {
+    Item item = getPredefinedItem(itemName);
+    auto it = std::find_if(inventory.begin(), inventory.end(), [&](const Item& i){ return i.name == itemName; });
+    if (it != inventory.end()) {
+        it->quantity += 1;
+    } else {
+        inventory.push_back(item);
+    }
+}
+
+void Character::addItem(const Item& item) {   // Overloaded method
+    auto it = std::find_if(inventory.begin(), inventory.end(), [&](const Item& i){ return i.name == item.name; });
+    if (it != inventory.end()) {
+        it->quantity += item.quantity;
+    } else {
+        inventory.push_back(item);
+    }
+}
+
+void Character::removeItem(const std::string& itemName) {
+    auto it = std::find_if(inventory.begin(), inventory.end(), [&](const Item& i){ return i.name == itemName; });
+    if (it != inventory.end()) {
+        it->quantity--;
+        if (it->quantity <= 0) {
+            inventory.erase(it);
+        }
+    }
+}
+
+void Character::displayInventory() {
+    for (const auto& item : inventory) {
+        std::cout << "Name: " << item.name << ", Attack Bonus: " << item.attackBonus
+                  << ", Defense Bonus: " << item.defenseBonus << ", Restore HP: " << item.restoreHp
+                  << ", Quantity: " << item.quantity << std::endl;
+    }
+}
+
+void Character::saveInventory() {
+    std::ofstream file(inventoryFile);
+    for (const auto& item : inventory) {
+        file << item.name << ";" << item.attackBonus << ";" << item.defenseBonus << ";" << item.restoreHp << ";" << item.quantity << std::endl;
+    }
+}
+
+void Character::loadInventory() {
+    std::ifstream file(inventoryFile);
+    std::string line;
+    while (std::getline(file, line)) {
+        size_t pos1 = line.find(";");
+        size_t pos2 = line.find(";", pos1 + 1);
+        size_t pos3 = line.find(";", pos2 + 1);
+        size_t pos4 = line.find(";", pos3 + 1);
+        std::string name = line.substr(0, pos1);
+        int attackBonus = std::stoi(line.substr(pos1 + 1, pos2 - pos1 - 1));
+        int defenseBonus = std::stoi(line.substr(pos2 + 1, pos3 - pos2 - 1));
+        int restoreHp = std::stoi(line.substr(pos3 + 1, pos4 - pos3 - 1));
+        int quantity = std::stoi(line.substr(pos4 + 1));
+        addItem(Item(name, attackBonus, defenseBonus, restoreHp, quantity));
+    }
+}
+
+void Character::equipItem(const std::string& itemName) {
+    auto it = std::find_if(inventory.begin(), inventory.end(), [&](const Item& i){ return i.name == itemName; });
+    if (it != inventory.end()) {
+        equipment.push_back(*it);
+        removeItem(itemName);
+    }
+}
+
+void Character::unequipItem(const std::string& itemName) {
+    auto it = std::find_if(equipment.begin(), equipment.end(), [&](const Item& i){ return i.name == itemName; });
+    if (it != equipment.end()) {
+        addItem(*it);
+        equipment.erase(it);
+    }
+}
+
+double Character::dropRate(const std::string& itemName) {
+    // Define drop rates for each item. Customize these as needed.
+    if (itemName == "Sword of Ice") return 0.5;
+    if (itemName == "Armor of Spikes") return 0.4;
+    if (itemName == "Potion of Health") return 0.7;
+    return 0.0;  // default
+}
+
+void Character::slayMonster() {
+    // For simplicity, we'll randomly select an item to drop when the monster is slain.
+    std::vector<std::string> items = {"Sword of Ice", "Armor of Spikes", "Potion of Health"};
+    int index = rand() % items.size();
+    if ((rand() / (double)RAND_MAX) <= dropRate(items[index])) {
+        addItem(items[index]);
+    }
+}
+
+void Character::updateInventory(const std::string& itemName, int quantityChange) {
+    auto it = std::find_if(inventory.begin(), inventory.end(), [&](const Item& i){ return i.name == itemName; });
+    if (it != inventory.end()) {
+        it->quantity += quantityChange;
+    } else {
+        addItem(Item(itemName, 5, 5, 20, quantityChange)); // You need to adjust the attack bonus, defense bonus, and restore HP here.
+    }
+}
 
 const std::vector<std::string>& Character::getFightHistory() const {
     return fightHistory;

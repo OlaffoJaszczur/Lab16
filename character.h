@@ -25,6 +25,7 @@ struct Item {
 class CharacterBase {
 protected:
     std::string name;
+    std::string inventoryFile = (name + "_inventory.txt");
     int strength, dexterity, endurance, intelligence, charisma;
     int experience, hp;
 
@@ -56,9 +57,15 @@ protected:
     int level;
     std::vector<std::string> fightHistory;
 
+    std::list<Item> inventory;
+    std::list<Item> equipment;
+    double dropRate(const std::string& itemName);
+    void updateInventory(const std::string& itemName, int quantityChange);
+
 public:
     Character();
     Character(int level);
+    Character(std::string name, std::string inventoryFile);
     Character(std::string name, int strength, int dexterity, int endurance, int intelligence, int charisma, int hp, int experience);
     ~Character();
 
@@ -70,6 +77,18 @@ public:
     void addFightToHistory(const std::string& fightInfo);  // Add this line
     void increase_experience(int value);
     void save_attributes();
+
+    void addItem(const std::string& itemName);
+    void addItem(const Item& item); // Overloaded method
+    void removeItem(const std::string& itemName);
+    void displayInventory();
+    void saveInventory();
+    void loadInventory();
+    void equipItem(const std::string& itemName);
+    void unequipItem(const std::string& itemName);
+    void slayMonster();
+
+    Item getPredefinedItem(const std::string& itemName);
 
     friend class Mage;
     friend class Warrior;

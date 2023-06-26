@@ -81,9 +81,8 @@ public:
 
     void addItem(const std::string& itemName);
     void addItem(const Item& item); // Overloaded method
-    void removeItem(const std::string& itemName);
     void displayInventory();
-    void saveInventory();
+    void saveInventory() const;
     void loadInventory();
     void equipItem(const std::string& itemName);
     void unequipItem(const std::string& itemName);

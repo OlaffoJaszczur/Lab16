@@ -7,6 +7,7 @@
 #include <sstream>
 #include <cstdio>
 #include <algorithm>
+#include <memory>
 
 #include "character.h"
 
@@ -111,6 +112,7 @@ int main() {
         std::cin >> choice;
 
         if (choice == 1) {
+
             std::cout << "Enter character name: ";
             std::cin >> name;
             std::cout << "You have a Pool of 30 points in total to distribute among Character statistics"<< std::endl;
@@ -190,6 +192,7 @@ int main() {
                 file >> level;
 
                 Character character (name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
+                character.loadInventory();
 
                 std::cout << "Character loaded successfully." << std::endl;
                 std::cout << "Name: " << character.get_name() << std::endl;
@@ -202,11 +205,13 @@ int main() {
                 std::cout << "Current Experience: " << character.get_experience() << std::endl;
                 std::cout << "Level: " << level << std::endl;
                 std::cout << "Here's one PoH on the house ;) " << std::endl;
-                character.addItem("Potion of Health");
+                character.addItem("Potion_of_Health");
                 std::cout << endl;
             } else {
                 std::cout << "Error loading file." << std::endl;
             }
+
+            character.displayInventory();
         }
 
         if (choice == 3) {

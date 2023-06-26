@@ -225,7 +225,7 @@ int main() {
 
         if (choice == 5) {
 
-            character = std::make_unique<Character>(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
+           // character = std::make_unique<Character>(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
             Monster monster;
             monster.save_monster();
 
@@ -321,11 +321,6 @@ int main() {
 
         if(choice == 6){
             displayFightHistory(*character);
-            std::cout << "Fight History:\n";
-            const std::vector<std::string>& fightHistory = character->getFightHistory();
-            for (auto it = fightHistory.rbegin(); it != fightHistory.rend(); ++it) {
-                std::cout << "- " << *it << '\n';
-            }
         }
 
         if(choice == 7){

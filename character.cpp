@@ -72,14 +72,14 @@ Character::Character(std::string name, int strength, int dexterity, int enduranc
     inventoryFile = name + "_inventory.txt";
     std::cout << "Inventory file: " << inventoryFile << std::endl;
     srand((unsigned)time(NULL));
-    //loadInventory();
+    loadInventory();
     std::cout << "Character created. Address of inventory: " << &inventory << std::endl;
 
 }
 
 Character::Character(std::string name, std::string inventoryFile) : CharacterBase(name, inventoryFile) { //no work
     srand((unsigned)time(NULL));
-    //loadInventory();
+    loadInventory();
 }
 
 Character::~Character() {}
@@ -103,6 +103,7 @@ void Character::addItem(const std::string& itemName) {
         inventory.emplace_back(item);
         std::cout << "Added item: " << item.name << std::endl;
     }
+    saveInventory();
 }
 
 void Character::addItem(const Item& item) {
@@ -113,7 +114,8 @@ void Character::addItem(const Item& item) {
     } else {
         inventory.emplace_back(item);
         std::cout << "Added item: " << item.name << std::endl;
-    }
+    }saveInventory();
+
 }
 
 void Character::displayInventory() {

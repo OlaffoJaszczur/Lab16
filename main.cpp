@@ -97,7 +97,7 @@ int main() {
     std::string name, filename, inventoryFile;
     int strength, dexterity, endurance, intelligence, charisma, hp, experience, level;
 
-    Character character(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
+    std::unique_ptr<Character> character;
     Monster monster(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
     Mage mage;
     Warrior warrior;
@@ -137,7 +137,7 @@ int main() {
             hp = 100;
             experience = 0;
 
-            Character character(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
+            character = std::make_unique<Character>(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
 
             int profession_choice;
             std::cout << "Choose profession:\n1. Mage\n2. Warrior\n3. Berserker\n4. Thief" << std::endl;
@@ -145,22 +145,22 @@ int main() {
 
             switch (profession_choice) {
                 case 1:
-                    mage.increase_attribute(character);
+                    mage.increase_attribute(*character);
                     std::cout << "Intelligence increased by 5." << std::endl;
                     break;
 
                 case 2:
-                    warrior.increase_attribute(character);
+                    warrior.increase_attribute(*character);
                     std::cout << "Endurance increased by 5." << std::endl;
                     break;
 
                 case 3:
-                    berserker.increase_attribute(character);
+                    berserker.increase_attribute(*character);
                     std::cout << "Strength increased by 5." << std::endl;
                     break;
 
                 case 4:
-                    thief.increase_attribute(character);
+                    thief.increase_attribute(*character);
                     std::cout << "Dexterity increased by 5." << std::endl;
                     break;
 
@@ -169,8 +169,8 @@ int main() {
                     break;
             }
 
-            character.save_attributes();
-            character.saveInventory();
+            character->save_attributes();
+            character->saveInventory();
 
             std::cout << "Character saved to file." << std::endl;
         }
@@ -191,27 +191,26 @@ int main() {
                 file >> experience;
                 file >> level;
 
-                Character character (name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
-                character.loadInventory();
+                character = std::make_unique<Character>(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
 
                 std::cout << "Character loaded successfully." << std::endl;
-                std::cout << "Name: " << character.get_name() << std::endl;
-                std::cout << "Strength: " << character.get_strength() << std::endl;
-                std::cout << "Dexterity: " << character.get_dexterity() << std::endl;
-                std::cout << "Endurance: " << character.get_endurance() << std::endl;
-                std::cout << "Intelligence: " << character.get_intelligence() << std::endl;
-                std::cout << "Charisma: " << character.get_charisma() << std::endl;
-                std::cout << "Current HP: " << character.get_hp() << std::endl;
-                std::cout << "Current Experience: " << character.get_experience() << std::endl;
+                std::cout << "Name: " << character->get_name() << std::endl;
+                std::cout << "Strength: " << character->get_strength() << std::endl;
+                std::cout << "Dexterity: " << character->get_dexterity() << std::endl;
+                std::cout << "Endurance: " << character->get_endurance() << std::endl;
+                std::cout << "Intelligence: " << character->get_intelligence() << std::endl;
+                std::cout << "Charisma: " << character->get_charisma() << std::endl;
+                std::cout << "Current HP: " << character->get_hp() << std::endl;
+                std::cout << "Current Experience: " << character->get_experience() << std::endl;
                 std::cout << "Level: " << level << std::endl;
                 std::cout << "Here's one PoH on the house ;) " << std::endl;
-                character.addItem("Potion_of_Health");
+                character->addItem("Potion_of_Health");
                 std::cout << endl;
             } else {
                 std::cout << "Error loading file." << std::endl;
             }
 
-            character.displayInventory();
+            character->displayInventory();
         }
 
         if (choice == 3) {
@@ -226,7 +225,7 @@ int main() {
 
         if (choice == 5) {
 
-            Character character (name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
+            character = std::make_unique<Character>(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
             Monster monster;
             monster.save_monster();
 
@@ -243,30 +242,30 @@ int main() {
             std::cout << "Current Experience: " << monster.get_experience() << std::endl;
 
             std::cout << "character loaded successfully?" << std::endl;
-            std::cout << "character: " << character.get_name() << std::endl;
-            std::cout << "Strength: " << character.get_strength() << std::endl;
-            std::cout << "Dexterity: " << character.get_dexterity() << std::endl;
-            std::cout << "Endurance: " << character.get_endurance() << std::endl;
-            std::cout << "Intelligence: " << character.get_intelligence() << std::endl;
-            std::cout << "Charisma: " << character.get_charisma() << std::endl;
-            std::cout << "HP: " << character.get_hp() << std::endl;
-            std::cout << "Experience: " << character.get_experience() << std::endl;
-            std::cout << "Level: " << character.get_level() << std::endl;
+            std::cout << "character: " << character->get_name() << std::endl;
+            std::cout << "Strength: " << character->get_strength() << std::endl;
+            std::cout << "Dexterity: " << character->get_dexterity() << std::endl;
+            std::cout << "Endurance: " << character->get_endurance() << std::endl;
+            std::cout << "Intelligence: " << character->get_intelligence() << std::endl;
+            std::cout << "Charisma: " << character->get_charisma() << std::endl;
+            std::cout << "HP: " << character->get_hp() << std::endl;
+            std::cout << "Experience: " << character->get_experience() << std::endl;
+            std::cout << "Level: " << character->get_level() << std::endl;
 
-            fight(character, monster);
+            fight(*character, monster);
 
-            std::cout << "character: " << character.get_name() << std::endl;
-            std::cout << "Strength: " << character.get_strength() << std::endl;
-            std::cout << "Dexterity: " << character.get_dexterity() << std::endl;
-            std::cout << "Endurance: " << character.get_endurance() << std::endl;
-            std::cout << "Intelligence: " << character.get_intelligence() << std::endl;
-            std::cout << "Charisma: " << character.get_charisma() << std::endl;
-            std::cout << "HP: " << character.get_hp() << std::endl;
-            std::cout << "Experience: " << character.get_experience() << std::endl;
-            std::cout << "Level: " << character.get_level() << std::endl;
+            std::cout << "character: " << character->get_name() << std::endl;
+            std::cout << "Strength: " << character->get_strength() << std::endl;
+            std::cout << "Dexterity: " << character->get_dexterity() << std::endl;
+            std::cout << "Endurance: " << character->get_endurance() << std::endl;
+            std::cout << "Intelligence: " << character->get_intelligence() << std::endl;
+            std::cout << "Charisma: " << character->get_charisma() << std::endl;
+            std::cout << "HP: " << character->get_hp() << std::endl;
+            std::cout << "Experience: " << character->get_experience() << std::endl;
+            std::cout << "Level: " << character->get_level() << std::endl;
 
-            int exp_after_battle = character.get_experience();
-            int lv_after_battle = character.get_level();
+            int exp_after_battle = character->get_experience();
+            int lv_after_battle = character->get_level();
 
             std::ifstream inputFile(name + ".txt");
             std::ofstream tempFile("temp.txt");
@@ -321,9 +320,9 @@ int main() {
         }
 
         if(choice == 6){
-            displayFightHistory(character);
+            displayFightHistory(*character);
             std::cout << "Fight History:\n";
-            const std::vector<std::string>& fightHistory = character.getFightHistory();
+            const std::vector<std::string>& fightHistory = character->getFightHistory();
             for (auto it = fightHistory.rbegin(); it != fightHistory.rend(); ++it) {
                 std::cout << "- " << *it << '\n';
             }
@@ -331,25 +330,25 @@ int main() {
 
         if(choice == 7){
             std::cout << "Inventory: " << std::endl;
-            character.displayInventory();
+            character->displayInventory();
         }
 
         if(choice == 8){
             string itemToBeEquipedName;
             cout << "What item do you wanna equip" << endl;
             cin >> itemToBeEquipedName;
-            character.equipItem(itemToBeEquipedName);
+            character->equipItem(itemToBeEquipedName);
         }
 
         if(choice == 9){
             string itemToBeUnequipedName;
             cout << "What item do you wanna equip" << endl;
             cin >> itemToBeUnequipedName;
-            character.unequipItem(itemToBeUnequipedName);
+            character->unequipItem(itemToBeUnequipedName);
         }
 
         if(choice == 10){
-            character.saveInventory();
+            character->saveInventory();
         }
 
     } while (choice != 10);

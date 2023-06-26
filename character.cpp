@@ -82,7 +82,9 @@ Character::Character(std::string name, std::string inventoryFile) : CharacterBas
     loadInventory();
 }
 
-Character::~Character() {}
+Character::~Character() {
+    saveInventory();
+}
 
 Item Character::getPredefinedItem(const std::string& itemName) {
     // Define the predefined items
@@ -103,7 +105,7 @@ void Character::addItem(const std::string& itemName) {
         inventory.emplace_back(item);
         std::cout << "Added item: " << item.name << std::endl;
     }
-    saveInventory();
+    //saveInventory();
 }
 
 void Character::addItem(const Item& item) {
@@ -114,8 +116,8 @@ void Character::addItem(const Item& item) {
     } else {
         inventory.emplace_back(item);
         std::cout << "Added item: " << item.name << std::endl;
-    }saveInventory();
-
+    }
+    //saveInventory();
 }
 
 void Character::displayInventory() {
@@ -201,6 +203,16 @@ void Character::updateInventory(const std::string& itemName, int quantityChange)
         addItem(item);
     }
     saveInventory();  // save the updated inventory to file
+}
+
+void Character::removeItem(const std::string& itemName) {
+    auto it = std::find_if(inventory.begin(), inventory.end(), [&](const Item& i){ return i.name == itemName; });
+    if (it != inventory.end()) {
+        it->quantity--;
+        if (it->quantity <= 0) {
+            inventory.erase(it);
+        }
+    }
 }
 
 const std::vector<std::string>& Character::getFightHistory() const {

@@ -37,7 +37,11 @@ CharacterBase::CharacterBase(std::string name, std::string inventoryFile) : name
 }
 
 int CharacterBase::getDefense() const {
-    return endurance;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1, 3);
+
+    return (endurance + dis(gen));
 }
 
 void CharacterBase::reduceHP(int damage) {
@@ -88,8 +92,8 @@ Character::~Character() {
 
 Item Character::getPredefinedItem(const std::string& itemName) {
     // Define the predefined items
-    if (itemName == "Sword_of_Ice") return Item(itemName, 2, 0, 0);
-    if (itemName == "Armor_of_Spikes") return Item(itemName, 0, 5, 0);
+    if (itemName == "Potion_of_Power") return Item(itemName, 2, 0, 0);
+    if (itemName == "Potion_of_Defense") return Item(itemName, 0, 5, 0);
     if (itemName == "Potion_of_Health") return Item(itemName, 0, 0, 20);
     // Default item
     return Item(itemName, 0, 0, 0);
@@ -177,15 +181,15 @@ void Character::unequipItem(const std::string& itemName) {
 
 double Character::dropRate(const std::string& itemName) {
     // Define drop rates for each item. Customize these as needed.
-    if (itemName == "Sword_of_Ice") return 0.5;
-    if (itemName == "Armor_of_Spikes") return 0.4;
+    if (itemName == "Potion_of_Power") return 0.5;
+    if (itemName == "Potion_of_Defense") return 0.4;
     if (itemName == "Potion_of_Health") return 0.7;
     return 0.0;  // default
 }
 
 void Character::slayMonster() {
     // For simplicity, we'll randomly select an item to drop when the monster is slain.
-    std::vector<std::string> items = {"Sword_of_Ice", "Armor_of_Spikes", "Potion_of_Health"};
+    std::vector<std::string> items = {"Potion_of_Power", "Potion_of_Defense", "Potion_of_Health"};
     int index = rand() % items.size();
     if ((rand() / (double)RAND_MAX) <= dropRate(items[index])) {
         addItem(getPredefinedItem(items[index]));
@@ -215,6 +219,38 @@ void Character::removeItem(const std::string& itemName) {
     }
 }
 
+void Character::drinkPotion(const std::string& itemName) {
+    // Find the item in the inventory
+    auto it = std::find_if(inventory.begin(), inventory.end(),[&](const Item& i){ return i.name == itemName; });
+
+    // If item is found in the inventory
+    if (it != inventory.end()) {
+        // Get predefined item stats
+        Item item = getPredefinedItem(itemName);
+
+        // Apply stats to the character
+        strength += item.attackBonus;
+        endurance += item.defenseBonus;
+        hp += item.restoreHp;
+
+        // Remove the item from inventory
+        removeItem(itemName);
+
+        if(itemName == "Potion_of_Power"){
+            std::cout << "Strength raised by 2, temporarly" << std::endl;
+        }
+        else if(itemName == "Potion_of_Defense"){
+            std::cout << "Endurence raised by 2, temporarly" << std::endl;
+        }
+        else if(itemName == "Potion_of_Health"){
+            std::cout << "Ah the taste of red, very red-freshing. Restored 20 hp" << std::endl;
+        }
+    } else {
+        // Handle the case when item is not found in the inventory
+        std::cout << "The item " << itemName << " is not in your inventory." << std::endl;
+    }
+}
+
 const std::vector<std::string>& Character::getFightHistory() const {
     return fightHistory;
 }
@@ -227,7 +263,11 @@ void Character::addFightToHistory(const std::string& fightInfo) {
 }
 
 int Character::getEquipmentDamage() const {
-    return (strength);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1, 3);
+
+    return (strength +  dis(gen));
 }
 
 void Character::save_attributes() {
@@ -420,6 +460,10 @@ void Monster::clear_monster_list() {
 }
 
 int Monster::get_attack() {
-    return strength;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(1, 3);
+
+    return (strength + dis(gen));
 }
 

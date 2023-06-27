@@ -63,6 +63,7 @@ void fight(CharacterType& character, MonsterType& monster) {
         damage = monster.get_attack() - character.getDefense();
         character.reduceHP(damage);
         cout << monster.get_name() << "  attacked with power:  " << monster.get_attack() << "  against monster:  " << character.get_name() << " with deffence:  " << character.getDefense() << "  for: " << damage << "  damage" << endl;
+        cout << "Alchemist's hp:  " << character.get_hp() << endl;
         if (character.isDefeated()) {
             std::cout << character.get_name() << " has been defeated!\n";
             character.increase_experience(-monster.get_experience());
@@ -105,10 +106,9 @@ int main() {
     Thief thief;
 
     do {
-        std::cout << "1. Create new character\n2. Load character\n3. Generate list of monsters\n"
+        std::cout << "1. Create new Alchemist\n2. Load Alchemist\n3. Generate list of monsters\n"
                      "4. Clear monster list\n5. Simulate fight with 5 generated monsters\n6. Show list of last 10 fights"
-                     "\n7. Show Inventory\n8. Equip an item\n9. Unequip an item"
-                     "\n10. Exit" << std::endl;
+                     "\n7. Show Inventory\n8. Drink a Potion\n9. Exit" << std::endl;
         std::cin >> choice;
 
         if (choice == 1) {
@@ -140,7 +140,7 @@ int main() {
             character = std::make_unique<Character>(name, strength, dexterity, endurance, intelligence, charisma, hp, experience);
 
             int profession_choice;
-            std::cout << "Choose profession:\n1. Mage\n2. Warrior\n3. Berserker\n4. Thief" << std::endl;
+            std::cout << "Choose elemental affinity:\n1. Ice\n2. Earth\n3. Fire\n4. Wind" << std::endl;
             std::cin >> profession_choice;
 
             switch (profession_choice) {
@@ -329,24 +329,17 @@ int main() {
         }
 
         if(choice == 8){
-            string itemToBeEquipedName;
-            cout << "What item do you wanna equip" << endl;
-            cin >> itemToBeEquipedName;
-            character->equipItem(itemToBeEquipedName);
+            string potinToBeDrunk;
+            cout << "What potion do you want to drink? (eg.Potion_of_Health:) " << endl;
+            cin >> potinToBeDrunk;
+            character->drinkPotion(potinToBeDrunk);
         }
 
         if(choice == 9){
-            string itemToBeUnequipedName;
-            cout << "What item do you wanna equip" << endl;
-            cin >> itemToBeUnequipedName;
-            character->unequipItem(itemToBeUnequipedName);
-        }
-
-        if(choice == 10){
             character->saveInventory();
         }
 
-    } while (choice != 10);
+    } while (choice != 9);
 
 
 
